@@ -27,9 +27,12 @@
         },
         
         heightChanged: function () {
-        	if(this.loaded && $('#TrustPayments-iframe-container > iframe').height() == 0) {
-        		$('#TrustPayments-iframe-container').parent().parent().hide();
-        	}
+            const self = this;
+            setTimeout(function () {
+                if(self.loaded && $('#TrustPayments-iframe-container > iframe').height() == 0) {
+                    $('#TrustPayments-iframe-container').parent().parent().hide();
+                }
+            }, 500);
         },
         
         getAgbParameter: function() {
