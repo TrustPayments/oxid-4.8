@@ -2,11 +2,11 @@
 
 # OXID 4.8
 
-v1.0.34, 2022-5
+v1.0.35, 2022-6
 
 This repository contains the OXID  Trust Payments payment module that enables the shop to process payments with [Trust Payments](https://www.trustpayments.com/).
 
-##### To use this extension, a [Trust Payments](https://www.trustpayments.com/) account is required.
+##### To use this extension, a [Trust Payments](https://ep.trustpayments.com/user/signup)  account is required.
 
 ## Requirements
 
@@ -19,8 +19,8 @@ Support queries can be issued on the [Trust Payments support site](https://www.t
 
 ## Documentation
 
-* [English](https://plugin-documentation.ep.trustpayments.com/TrustPayments/oxid-4.8/1.0.34/docs/en/documentation.html)
+* [English](https://plugin-documentation.ep.trustpayments.com/TrustPayments/oxid-4.8/1.0.35/docs/en/documentation.html)
 
 ## License
 
-Please see the [license file](https://github.com/TrustPayments/oxid-4.8/blob/1.0.34/LICENSE) for more information.
+Please see the [license file](https://github.com/TrustPayments/oxid-4.8/blob/1.0.35/LICENSE) for more information.
