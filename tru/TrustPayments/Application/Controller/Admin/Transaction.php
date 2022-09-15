@@ -16,6 +16,7 @@ use Monolog\Logger;
 use TrustPayments\Sdk\Model\RefundState;
 use TrustPayments\Sdk\Model\TransactionCompletionState;
 use TrustPayments\Sdk\Model\TransactionVoidState;
+use Tru\TrustPayments\Core\Exception\OptimisticLockingException;
 use Tru\TrustPayments\Core\Service\CompletionService;
 use Tru\TrustPayments\Core\Service\RefundService;
 use Tru\TrustPayments\Core\Service\VoidService;
@@ -58,6 +59,9 @@ class_exists(\Tru\TrustPayments\Application\Model\Transaction::class);          
             } else {
                 throw new \Exception(TrustPaymentsModule::instance()->translate('No order selected'));
             }
+        } catch (OptimisticLockingException $e) {
+            $this->_aViewData['tru_trustPayments_enabled'] = $e->getMessage();
+            return $this->_sThisTemplate;
         } catch (\Exception $e) {
             $this->_aViewData['tru_error'] = $e->getMessage();
             return 'truTrustPaymentsError.tpl';
