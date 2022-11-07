@@ -12,7 +12,6 @@
 namespace Tru\TrustPayments\Application\Model;
 require_once(OX_BASE_PATH . 'modules/tru/TrustPayments/autoload.php');
 
-;
 
 /**
  * Class Alert.
@@ -43,15 +42,5 @@ class Alert
     public static function loadAll() {
         $query = "SELECT `TRUKEY`, `TRUCOUNT`, `TRUFUNC`, `TRUTARGET` FROM `truTrustPayments_alert`";
         return \oxdb::getDb()->getAll($query);
-    }
-
-    /**
-     * Class constructor.
-     */
-    public function __construct()
-    {
-        parent::__construct();
-
-        $this->init(self::getTableName());
     }
 }
