@@ -19,6 +19,7 @@ use \TrustPayments\Sdk\ApiClient;
 use TrustPayments\Sdk\Model\TransactionState;
 use Tru\TrustPayments\Core\Provider\Language as LanguageProvider;
 use Tru\TrustPayments\Application\Model\Transaction;
+use OxidEsales\EshopCommunity\Core\ShopVersion;
 
 /**
  * Class TrustPaymentsModule
@@ -28,6 +29,9 @@ use Tru\TrustPayments\Application\Model\Transaction;
  */
 class TrustPaymentsModule extends \oxmodule
 {
+    const SHOP_SYSTEM = 'x-meta-shop-system';
+    const SHOP_SYSTEM_VERSION = 'x-meta-shop-system-version';
+    const SHOP_SYSTEM_AND_VERSION = 'x-meta-shop-system-and-version';
     const FALLBACK_LANGUAGE = 'en-US';
     const PAYMENT_PREFIX = 'oxidtru';
     /**
@@ -309,6 +313,9 @@ class TrustPaymentsModule extends \oxmodule
         if ($this->apiClient === null || $refresh) {
             $this->apiClient = new ApiClient($this->getSettings()->getUserId(), $this->getSettings()->getAppKey());
             $this->apiClient->setBasePath($this->getSettings()->getBaseUrl() . '/api');
+            foreach (self::getDefaultHeaderData() as $key => $value) {
+                $this->apiClient->addDefaultHeader($key, $value);
+            }
             if ($this->getSettings()->isLogCommunications()) {
                 self::log(Logger::DEBUG, 'Enabling logging on ApiClient.');
                 $this->apiClient->enableDebugging();
@@ -530,5 +537,20 @@ class_exists('oxdbmetadatahandler');        $oDbHandler = oxNew('oxdbmetadatahan
         } catch (\Exception $e) {
             TrustPaymentsModule::log(Logger::ERROR, "UNABLE TO ROLLBACK: {$e->getMessage()} - {$e->getTraceAsString()}.");
         }
+    }
+	
+	
+    /**
+     * @return array
+     */
+    protected static function getDefaultHeaderData()
+	{
+        $shop_version = ShopVersion::getVersion();
+        [$major_version, $minor_version, $_] = explode('.', $shop_version, 3);
+        return [
+            self::SHOP_SYSTEM             => 'oxid',
+            self::SHOP_SYSTEM_VERSION     => $shop_version,
+            self::SHOP_SYSTEM_AND_VERSION => 'oxid-' . $major_version . '.' . $minor_version,
+        ];
     }
 }
