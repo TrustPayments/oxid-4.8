@@ -83,4 +83,5 @@ CREATE TABLE IF NOT EXISTS `truTrustPayments_alert` (
 
 INSERT INTO `truTrustPayments_alert` (`TRUKEY`, `TRUFUNC`, `TRUTARGET`, `TRUCOUNT`) VALUES ('manual_task', 'manualtask', '_parent', 0);
 
+SET SQL_MODE='ALLOW_INVALID_DATES';
 CREATE INDEX idx_tru_oxorder_oxtransstatus ON `oxorder` (`OXTRANSSTATUS`);
