@@ -1,0 +1,1 @@
+ALTER TABLE `truTrustPayments_transaction` ADD `TRUEMAILSENT` bool DEFAULT '0';
