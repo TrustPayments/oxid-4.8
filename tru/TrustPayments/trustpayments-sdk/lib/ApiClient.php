@@ -47,14 +47,18 @@ final class ApiClient {
 	 *
 	 * @var array
 	 */
-	private $defaultHeaders = [];
+	private $defaultHeaders = [
+        'x-meta-sdk-version' => "3.2.0",
+        'x-meta-sdk-language' => 'php',
+        'x-meta-sdk-provider' => "Trust Payments",
+    ];
 
 	/**
 	 * The user agent that is sent with any request.
 	 *
 	 * @var string
 	 */
-	private $userAgent = 'PHP-Client/2.1.4/php';
+	private $userAgent = 'PHP-Client/3.2.0/php';
 
 	/**
 	 * The path to the certificate authority file.
@@ -70,13 +74,19 @@ final class ApiClient {
 	 */
 	private $enableCertificateAuthorityCheck = true;
 
-	/**
+    /**
+     * the constant for the default connection time out
+     *
+     * @var integer
+     */
+    const INITIAL_CONNECTION_TIMEOUT = 25;
+
+    /**
 	 * The connection timeout in seconds.
 	 *
 	 * @var integer
 	 */
-	private $connectionTimeout = 20;
-	CONST CONNECTION_TIMEOUT = 20;
+	private $connectionTimeout;
 
 	/**
 	 * The http client type to use for communication.
@@ -134,10 +144,12 @@ final class ApiClient {
 		$this->userId = $userId;
         $this->applicationKey = $applicationKey;
 
+        $this->connectionTimeout = self::INITIAL_CONNECTION_TIMEOUT;
 		$this->certificateAuthority = dirname(__FILE__) . '/ca-bundle.crt';
 		$this->serializer = new ObjectSerializer();
 		$this->isDebuggingEnabled() ? $this->serializer->enableDebugging() : $this->serializer->disableDebugging();
 		$this->serializer->setDebugFile($this->getDebugFile());
+		$this->addDefaultHeader('x-meta-sdk-language-version', phpversion());
 	}
 
 	/**
@@ -248,7 +260,7 @@ final class ApiClient {
 	 * @return ApiClient
 	 */
 	public function resetConnectionTimeout() {
-		$this->connectionTimeout = self::CONNECTION_TIMEOUT;
+		$this->connectionTimeout = self::INITIAL_CONNECTION_TIMEOUT;
 		return $this;
 	}
 
@@ -311,9 +323,19 @@ final class ApiClient {
 			throw new \InvalidArgumentException('The header key must be a string.');
 		}
 
-		$defaultHeaders[$key] = $value;
+		$this->defaultHeaders[$key] = $value;
 		return $this;
 	}
+
+	/**
+     * Gets the default headers that will be sent in the request.
+	 * 
+	 * @since 3.1.2
+	 * @return string[]
+     */
+    function getDefaultHeaders() {
+        return $this->defaultHeaders;
+    }
 
 	/**
 	 * Returns true, when debugging is enabled.
@@ -445,8 +467,11 @@ final class ApiClient {
 	 * @throws \TrustPayments\Sdk\Http\ConnectionException
 	 * @throws \TrustPayments\Sdk\VersioningException
 	 */
-	public function callApi($resourcePath, $method, $queryParams, $postData, $headerParams, $responseType = null, $endpointPath = null) {
-		$request = new HttpRequest($this->getSerializer(), $this->buildRequestUrl($resourcePath, $queryParams), $method, $this->generateUniqueToken());
+	public function callApi($resourcePath, $method, $queryParams, $postData, $headerParams, $responseType = null, $endpointPath = null, $timeOut = null) {
+        if ($timeOut === null) {
+            $timeOut = $this->getConnectionTimeout();
+        }
+		$request = new HttpRequest($this->getSerializer(), $this->buildRequestUrl($resourcePath, $queryParams), $method, $this->generateUniqueToken(), $timeOut);
 		$request->setUserAgent($this->getUserAgent());
 		$request->addHeaders(array_merge(
 			(array)$this->defaultHeaders,
@@ -944,6 +969,18 @@ final class ApiClient {
         return $this->paymentTerminalTillService;
     }
     
+    protected $paymentTerminalTransactionSummaryService;
+
+    /**
+     * @return \TrustPayments\Sdk\Service\PaymentTerminalTransactionSummaryService
+     */
+    public function getPaymentTerminalTransactionSummaryService() {
+        if(is_null($this->paymentTerminalTransactionSummaryService)){
+            $this->paymentTerminalTransactionSummaryService = new \TrustPayments\Sdk\Service\PaymentTerminalTransactionSummaryService($this);
+        }
+        return $this->paymentTerminalTransactionSummaryService;
+    }
+    
     protected $permissionService;
 
     /**
@@ -980,6 +1017,18 @@ final class ApiClient {
         return $this->refundService;
     }
     
+    protected $shopifyTransactionService;
+
+    /**
+     * @return \TrustPayments\Sdk\Service\ShopifyTransactionService
+     */
+    public function getShopifyTransactionService() {
+        if(is_null($this->shopifyTransactionService)){
+            $this->shopifyTransactionService = new \TrustPayments\Sdk\Service\ShopifyTransactionService($this);
+        }
+        return $this->shopifyTransactionService;
+    }
+    
     protected $spaceService;
 
     /**
@@ -1002,6 +1051,246 @@ final class ApiClient {
             $this->staticValueService = new \TrustPayments\Sdk\Service\StaticValueService($this);
         }
         return $this->staticValueService;
+    }
+    
+    protected $subscriberService;
+
+    /**
+     * @return \TrustPayments\Sdk\Service\SubscriberService
+     */
+    public function getSubscriberService() {
+        if(is_null($this->subscriberService)){
+            $this->subscriberService = new \TrustPayments\Sdk\Service\SubscriberService($this);
+        }
+        return $this->subscriberService;
+    }
+    
+    protected $subscriptionAffiliateService;
+
+    /**
+     * @return \TrustPayments\Sdk\Service\SubscriptionAffiliateService
+     */
+    public function getSubscriptionAffiliateService() {
+        if(is_null($this->subscriptionAffiliateService)){
+            $this->subscriptionAffiliateService = new \TrustPayments\Sdk\Service\SubscriptionAffiliateService($this);
+        }
+        return $this->subscriptionAffiliateService;
+    }
+    
+    protected $subscriptionChargeService;
+
+    /**
+     * @return \TrustPayments\Sdk\Service\SubscriptionChargeService
+     */
+    public function getSubscriptionChargeService() {
+        if(is_null($this->subscriptionChargeService)){
+            $this->subscriptionChargeService = new \TrustPayments\Sdk\Service\SubscriptionChargeService($this);
+        }
+        return $this->subscriptionChargeService;
+    }
+    
+    protected $subscriptionLedgerEntryService;
+
+    /**
+     * @return \TrustPayments\Sdk\Service\SubscriptionLedgerEntryService
+     */
+    public function getSubscriptionLedgerEntryService() {
+        if(is_null($this->subscriptionLedgerEntryService)){
+            $this->subscriptionLedgerEntryService = new \TrustPayments\Sdk\Service\SubscriptionLedgerEntryService($this);
+        }
+        return $this->subscriptionLedgerEntryService;
+    }
+    
+    protected $subscriptionMetricService;
+
+    /**
+     * @return \TrustPayments\Sdk\Service\SubscriptionMetricService
+     */
+    public function getSubscriptionMetricService() {
+        if(is_null($this->subscriptionMetricService)){
+            $this->subscriptionMetricService = new \TrustPayments\Sdk\Service\SubscriptionMetricService($this);
+        }
+        return $this->subscriptionMetricService;
+    }
+    
+    protected $subscriptionMetricUsageService;
+
+    /**
+     * @return \TrustPayments\Sdk\Service\SubscriptionMetricUsageService
+     */
+    public function getSubscriptionMetricUsageService() {
+        if(is_null($this->subscriptionMetricUsageService)){
+            $this->subscriptionMetricUsageService = new \TrustPayments\Sdk\Service\SubscriptionMetricUsageService($this);
+        }
+        return $this->subscriptionMetricUsageService;
+    }
+    
+    protected $subscriptionPeriodBillService;
+
+    /**
+     * @return \TrustPayments\Sdk\Service\SubscriptionPeriodBillService
+     */
+    public function getSubscriptionPeriodBillService() {
+        if(is_null($this->subscriptionPeriodBillService)){
+            $this->subscriptionPeriodBillService = new \TrustPayments\Sdk\Service\SubscriptionPeriodBillService($this);
+        }
+        return $this->subscriptionPeriodBillService;
+    }
+    
+    protected $subscriptionProductComponentGroupService;
+
+    /**
+     * @return \TrustPayments\Sdk\Service\SubscriptionProductComponentGroupService
+     */
+    public function getSubscriptionProductComponentGroupService() {
+        if(is_null($this->subscriptionProductComponentGroupService)){
+            $this->subscriptionProductComponentGroupService = new \TrustPayments\Sdk\Service\SubscriptionProductComponentGroupService($this);
+        }
+        return $this->subscriptionProductComponentGroupService;
+    }
+    
+    protected $subscriptionProductComponentService;
+
+    /**
+     * @return \TrustPayments\Sdk\Service\SubscriptionProductComponentService
+     */
+    public function getSubscriptionProductComponentService() {
+        if(is_null($this->subscriptionProductComponentService)){
+            $this->subscriptionProductComponentService = new \TrustPayments\Sdk\Service\SubscriptionProductComponentService($this);
+        }
+        return $this->subscriptionProductComponentService;
+    }
+    
+    protected $subscriptionProductFeeTierService;
+
+    /**
+     * @return \TrustPayments\Sdk\Service\SubscriptionProductFeeTierService
+     */
+    public function getSubscriptionProductFeeTierService() {
+        if(is_null($this->subscriptionProductFeeTierService)){
+            $this->subscriptionProductFeeTierService = new \TrustPayments\Sdk\Service\SubscriptionProductFeeTierService($this);
+        }
+        return $this->subscriptionProductFeeTierService;
+    }
+    
+    protected $subscriptionProductMeteredFeeService;
+
+    /**
+     * @return \TrustPayments\Sdk\Service\SubscriptionProductMeteredFeeService
+     */
+    public function getSubscriptionProductMeteredFeeService() {
+        if(is_null($this->subscriptionProductMeteredFeeService)){
+            $this->subscriptionProductMeteredFeeService = new \TrustPayments\Sdk\Service\SubscriptionProductMeteredFeeService($this);
+        }
+        return $this->subscriptionProductMeteredFeeService;
+    }
+    
+    protected $subscriptionProductPeriodFeeService;
+
+    /**
+     * @return \TrustPayments\Sdk\Service\SubscriptionProductPeriodFeeService
+     */
+    public function getSubscriptionProductPeriodFeeService() {
+        if(is_null($this->subscriptionProductPeriodFeeService)){
+            $this->subscriptionProductPeriodFeeService = new \TrustPayments\Sdk\Service\SubscriptionProductPeriodFeeService($this);
+        }
+        return $this->subscriptionProductPeriodFeeService;
+    }
+    
+    protected $subscriptionProductRetirementService;
+
+    /**
+     * @return \TrustPayments\Sdk\Service\SubscriptionProductRetirementService
+     */
+    public function getSubscriptionProductRetirementService() {
+        if(is_null($this->subscriptionProductRetirementService)){
+            $this->subscriptionProductRetirementService = new \TrustPayments\Sdk\Service\SubscriptionProductRetirementService($this);
+        }
+        return $this->subscriptionProductRetirementService;
+    }
+    
+    protected $subscriptionProductService;
+
+    /**
+     * @return \TrustPayments\Sdk\Service\SubscriptionProductService
+     */
+    public function getSubscriptionProductService() {
+        if(is_null($this->subscriptionProductService)){
+            $this->subscriptionProductService = new \TrustPayments\Sdk\Service\SubscriptionProductService($this);
+        }
+        return $this->subscriptionProductService;
+    }
+    
+    protected $subscriptionProductSetupFeeService;
+
+    /**
+     * @return \TrustPayments\Sdk\Service\SubscriptionProductSetupFeeService
+     */
+    public function getSubscriptionProductSetupFeeService() {
+        if(is_null($this->subscriptionProductSetupFeeService)){
+            $this->subscriptionProductSetupFeeService = new \TrustPayments\Sdk\Service\SubscriptionProductSetupFeeService($this);
+        }
+        return $this->subscriptionProductSetupFeeService;
+    }
+    
+    protected $subscriptionProductVersionRetirementService;
+
+    /**
+     * @return \TrustPayments\Sdk\Service\SubscriptionProductVersionRetirementService
+     */
+    public function getSubscriptionProductVersionRetirementService() {
+        if(is_null($this->subscriptionProductVersionRetirementService)){
+            $this->subscriptionProductVersionRetirementService = new \TrustPayments\Sdk\Service\SubscriptionProductVersionRetirementService($this);
+        }
+        return $this->subscriptionProductVersionRetirementService;
+    }
+    
+    protected $subscriptionProductVersionService;
+
+    /**
+     * @return \TrustPayments\Sdk\Service\SubscriptionProductVersionService
+     */
+    public function getSubscriptionProductVersionService() {
+        if(is_null($this->subscriptionProductVersionService)){
+            $this->subscriptionProductVersionService = new \TrustPayments\Sdk\Service\SubscriptionProductVersionService($this);
+        }
+        return $this->subscriptionProductVersionService;
+    }
+    
+    protected $subscriptionService;
+
+    /**
+     * @return \TrustPayments\Sdk\Service\SubscriptionService
+     */
+    public function getSubscriptionService() {
+        if(is_null($this->subscriptionService)){
+            $this->subscriptionService = new \TrustPayments\Sdk\Service\SubscriptionService($this);
+        }
+        return $this->subscriptionService;
+    }
+    
+    protected $subscriptionSuspensionService;
+
+    /**
+     * @return \TrustPayments\Sdk\Service\SubscriptionSuspensionService
+     */
+    public function getSubscriptionSuspensionService() {
+        if(is_null($this->subscriptionSuspensionService)){
+            $this->subscriptionSuspensionService = new \TrustPayments\Sdk\Service\SubscriptionSuspensionService($this);
+        }
+        return $this->subscriptionSuspensionService;
+    }
+    
+    protected $subscriptionVersionService;
+
+    /**
+     * @return \TrustPayments\Sdk\Service\SubscriptionVersionService
+     */
+    public function getSubscriptionVersionService() {
+        if(is_null($this->subscriptionVersionService)){
+            $this->subscriptionVersionService = new \TrustPayments\Sdk\Service\SubscriptionVersionService($this);
+        }
+        return $this->subscriptionVersionService;
     }
     
     protected $tokenService;
@@ -1098,6 +1387,18 @@ final class ApiClient {
             $this->transactionLightboxService = new \TrustPayments\Sdk\Service\TransactionLightboxService($this);
         }
         return $this->transactionLightboxService;
+    }
+    
+    protected $transactionLineItemVersionService;
+
+    /**
+     * @return \TrustPayments\Sdk\Service\TransactionLineItemVersionService
+     */
+    public function getTransactionLineItemVersionService() {
+        if(is_null($this->transactionLineItemVersionService)){
+            $this->transactionLineItemVersionService = new \TrustPayments\Sdk\Service\TransactionLineItemVersionService($this);
+        }
+        return $this->transactionLineItemVersionService;
     }
     
     protected $transactionMobileSdkService;

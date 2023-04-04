@@ -24,15 +24,14 @@ use \ArrayAccess;
 use \TrustPayments\Sdk\ObjectSerializer;
 
 /**
- * TransactionLineItemUpdateRequest model
+ * AbstractSubscriptionAffiliateUpdate model
  *
  * @category    Class
- * @description 
  * @package     TrustPayments\Sdk
  * @author      customweb GmbH
  * @license     http://www.apache.org/licenses/LICENSE-2.0 Apache License v2
  */
-class TransactionLineItemUpdateRequest implements ModelInterface, ArrayAccess
+class AbstractSubscriptionAffiliateUpdate implements ModelInterface, ArrayAccess
 {
     const DISCRIMINATOR = null;
 
@@ -41,7 +40,7 @@ class TransactionLineItemUpdateRequest implements ModelInterface, ArrayAccess
       *
       * @var string
       */
-    protected static $swaggerModelName = 'TransactionLineItemUpdateRequest';
+    protected static $swaggerModelName = 'Abstract.SubscriptionAffiliate.Update';
 
     /**
       * Array of property to type mappings. Used for (de)serialization
@@ -49,8 +48,10 @@ class TransactionLineItemUpdateRequest implements ModelInterface, ArrayAccess
       * @var string[]
       */
     protected static $swaggerTypes = [
-        'new_line_items' => '\TrustPayments\Sdk\Model\LineItemCreate[]',
-        'transaction_id' => 'int'
+        'language' => 'string',
+        'meta_data' => 'map[string,string]',
+        'name' => 'string',
+        'state' => '\TrustPayments\Sdk\Model\CreationEntityState'
     ];
 
     /**
@@ -59,8 +60,10 @@ class TransactionLineItemUpdateRequest implements ModelInterface, ArrayAccess
       * @var string[]
       */
     protected static $swaggerFormats = [
-        'new_line_items' => null,
-        'transaction_id' => 'int64'
+        'language' => null,
+        'meta_data' => null,
+        'name' => null,
+        'state' => null
     ];
 
     /**
@@ -70,8 +73,10 @@ class TransactionLineItemUpdateRequest implements ModelInterface, ArrayAccess
      * @var string[]
      */
     protected static $attributeMap = [
-        'new_line_items' => 'newLineItems',
-        'transaction_id' => 'transactionId'
+        'language' => 'language',
+        'meta_data' => 'metaData',
+        'name' => 'name',
+        'state' => 'state'
     ];
 
     /**
@@ -80,8 +85,10 @@ class TransactionLineItemUpdateRequest implements ModelInterface, ArrayAccess
      * @var string[]
      */
     protected static $setters = [
-        'new_line_items' => 'setNewLineItems',
-        'transaction_id' => 'setTransactionId'
+        'language' => 'setLanguage',
+        'meta_data' => 'setMetaData',
+        'name' => 'setName',
+        'state' => 'setState'
     ];
 
     /**
@@ -90,8 +97,10 @@ class TransactionLineItemUpdateRequest implements ModelInterface, ArrayAccess
      * @var string[]
      */
     protected static $getters = [
-        'new_line_items' => 'getNewLineItems',
-        'transaction_id' => 'getTransactionId'
+        'language' => 'getLanguage',
+        'meta_data' => 'getMetaData',
+        'name' => 'getName',
+        'state' => 'getState'
     ];
 
     
@@ -112,9 +121,13 @@ class TransactionLineItemUpdateRequest implements ModelInterface, ArrayAccess
     public function __construct(array $data = null)
     {
         
-        $this->container['new_line_items'] = isset($data['new_line_items']) ? $data['new_line_items'] : null;
+        $this->container['language'] = isset($data['language']) ? $data['language'] : null;
         
-        $this->container['transaction_id'] = isset($data['transaction_id']) ? $data['transaction_id'] : null;
+        $this->container['meta_data'] = isset($data['meta_data']) ? $data['meta_data'] : null;
+        
+        $this->container['name'] = isset($data['name']) ? $data['name'] : null;
+        
+        $this->container['state'] = isset($data['state']) ? $data['state'] : null;
         
     }
 
@@ -127,9 +140,14 @@ class TransactionLineItemUpdateRequest implements ModelInterface, ArrayAccess
     {
         $invalidProperties = [];
 
-        if ($this->container['transaction_id'] === null) {
-            $invalidProperties[] = "'transaction_id' can't be null";
+        if (!is_null($this->container['name']) && (mb_strlen($this->container['name']) > 255)) {
+            $invalidProperties[] = "invalid value for 'name', the character length must be smaller than or equal to 255.";
         }
+
+        if (!is_null($this->container['name']) && (mb_strlen($this->container['name']) < 3)) {
+            $invalidProperties[] = "invalid value for 'name', the character length must be bigger than or equal to 3.";
+        }
+
         return $invalidProperties;
     }
 
@@ -211,50 +229,107 @@ class TransactionLineItemUpdateRequest implements ModelInterface, ArrayAccess
     
 
     /**
-     * Gets new_line_items
+     * Gets language
      *
-     * @return \TrustPayments\Sdk\Model\LineItemCreate[]
+     * @return string
      */
-    public function getNewLineItems()
+    public function getLanguage()
     {
-        return $this->container['new_line_items'];
+        return $this->container['language'];
     }
 
     /**
-     * Sets new_line_items
+     * Sets language
      *
-     * @param \TrustPayments\Sdk\Model\LineItemCreate[] $new_line_items 
+     * @param string $language The language that is linked to the object.
      *
      * @return $this
      */
-    public function setNewLineItems($new_line_items)
+    public function setLanguage($language)
     {
-        $this->container['new_line_items'] = $new_line_items;
+        $this->container['language'] = $language;
 
         return $this;
     }
     
 
     /**
-     * Gets transaction_id
+     * Gets meta_data
      *
-     * @return int
+     * @return map[string,string]
      */
-    public function getTransactionId()
+    public function getMetaData()
     {
-        return $this->container['transaction_id'];
+        return $this->container['meta_data'];
     }
 
     /**
-     * Sets transaction_id
+     * Sets meta_data
      *
-     * @param int $transaction_id 
+     * @param map[string,string] $meta_data Meta data allow to store additional data along the object.
      *
      * @return $this
      */
-    public function setTransactionId($transaction_id)
+    public function setMetaData($meta_data)
     {
-        $this->container['transaction_id'] = $transaction_id;
+        $this->container['meta_data'] = $meta_data;
+
+        return $this;
+    }
+    
+
+    /**
+     * Gets name
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->container['name'];
+    }
+
+    /**
+     * Sets name
+     *
+     * @param string $name 
+     *
+     * @return $this
+     */
+    public function setName($name)
+    {
+        if (!is_null($name) && (mb_strlen($name) > 255)) {
+            throw new \InvalidArgumentException('invalid length for $name when calling AbstractSubscriptionAffiliateUpdate., must be smaller than or equal to 255.');
+        }
+        if (!is_null($name) && (mb_strlen($name) < 3)) {
+            throw new \InvalidArgumentException('invalid length for $name when calling AbstractSubscriptionAffiliateUpdate., must be bigger than or equal to 3.');
+        }
+
+        $this->container['name'] = $name;
+
+        return $this;
+    }
+    
+
+    /**
+     * Gets state
+     *
+     * @return \TrustPayments\Sdk\Model\CreationEntityState
+     */
+    public function getState()
+    {
+        return $this->container['state'];
+    }
+
+    /**
+     * Sets state
+     *
+     * @param \TrustPayments\Sdk\Model\CreationEntityState $state The object's current state.
+     *
+     * @return $this
+     */
+    public function setState($state)
+    {
+        $this->container['state'] = $state;
 
         return $this;
     }
@@ -266,6 +341,7 @@ class TransactionLineItemUpdateRequest implements ModelInterface, ArrayAccess
      *
      * @return boolean
      */
+    #[\ReturnTypeWillChange]
     public function offsetExists($offset)
     {
         return isset($this->container[$offset]);
@@ -278,6 +354,7 @@ class TransactionLineItemUpdateRequest implements ModelInterface, ArrayAccess
      *
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         return isset($this->container[$offset]) ? $this->container[$offset] : null;
@@ -291,6 +368,7 @@ class TransactionLineItemUpdateRequest implements ModelInterface, ArrayAccess
      *
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetSet($offset, $value)
     {
         if (is_null($offset)) {
@@ -307,6 +385,7 @@ class TransactionLineItemUpdateRequest implements ModelInterface, ArrayAccess
      *
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetUnset($offset)
     {
         unset($this->container[$offset]);

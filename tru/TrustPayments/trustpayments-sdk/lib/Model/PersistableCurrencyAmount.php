@@ -19,10 +19,12 @@
 
 
 namespace TrustPayments\Sdk\Model;
+
+use \ArrayAccess;
 use \TrustPayments\Sdk\ObjectSerializer;
 
 /**
- * PaymentTerminalContactAddress model
+ * PersistableCurrencyAmount model
  *
  * @category    Class
  * @description 
@@ -30,7 +32,7 @@ use \TrustPayments\Sdk\ObjectSerializer;
  * @author      customweb GmbH
  * @license     http://www.apache.org/licenses/LICENSE-2.0 Apache License v2
  */
-class PaymentTerminalContactAddress extends PaymentTerminalAddress 
+class PersistableCurrencyAmount implements ModelInterface, ArrayAccess
 {
     const DISCRIMINATOR = null;
 
@@ -39,7 +41,7 @@ class PaymentTerminalContactAddress extends PaymentTerminalAddress
       *
       * @var string
       */
-    protected static $swaggerModelName = 'PaymentTerminalContactAddress';
+    protected static $swaggerModelName = 'PersistableCurrencyAmount';
 
     /**
       * Array of property to type mappings. Used for (de)serialization
@@ -47,10 +49,8 @@ class PaymentTerminalContactAddress extends PaymentTerminalAddress
       * @var string[]
       */
     protected static $swaggerTypes = [
-        'family_name' => 'string',
-        'given_name' => 'string',
-        'organization_name' => 'string',
-        'phone_number' => 'string'
+        'amount' => 'float',
+        'currency' => 'string'
     ];
 
     /**
@@ -59,10 +59,8 @@ class PaymentTerminalContactAddress extends PaymentTerminalAddress
       * @var string[]
       */
     protected static $swaggerFormats = [
-        'family_name' => null,
-        'given_name' => null,
-        'organization_name' => null,
-        'phone_number' => null
+        'amount' => null,
+        'currency' => null
     ];
 
     /**
@@ -72,10 +70,8 @@ class PaymentTerminalContactAddress extends PaymentTerminalAddress
      * @var string[]
      */
     protected static $attributeMap = [
-        'family_name' => 'familyName',
-        'given_name' => 'givenName',
-        'organization_name' => 'organizationName',
-        'phone_number' => 'phoneNumber'
+        'amount' => 'amount',
+        'currency' => 'currency'
     ];
 
     /**
@@ -84,10 +80,8 @@ class PaymentTerminalContactAddress extends PaymentTerminalAddress
      * @var string[]
      */
     protected static $setters = [
-        'family_name' => 'setFamilyName',
-        'given_name' => 'setGivenName',
-        'organization_name' => 'setOrganizationName',
-        'phone_number' => 'setPhoneNumber'
+        'amount' => 'setAmount',
+        'currency' => 'setCurrency'
     ];
 
     /**
@@ -96,14 +90,18 @@ class PaymentTerminalContactAddress extends PaymentTerminalAddress
      * @var string[]
      */
     protected static $getters = [
-        'family_name' => 'getFamilyName',
-        'given_name' => 'getGivenName',
-        'organization_name' => 'getOrganizationName',
-        'phone_number' => 'getPhoneNumber'
+        'amount' => 'getAmount',
+        'currency' => 'getCurrency'
     ];
 
     
 
+    /**
+     * Associative array for storing property values
+     *
+     * @var mixed[]
+     */
+    protected $container = [];
 
     /**
      * Constructor
@@ -113,16 +111,10 @@ class PaymentTerminalContactAddress extends PaymentTerminalAddress
      */
     public function __construct(array $data = null)
     {
-        parent::__construct($data);
-
         
-        $this->container['family_name'] = isset($data['family_name']) ? $data['family_name'] : null;
+        $this->container['amount'] = isset($data['amount']) ? $data['amount'] : null;
         
-        $this->container['given_name'] = isset($data['given_name']) ? $data['given_name'] : null;
-        
-        $this->container['organization_name'] = isset($data['organization_name']) ? $data['organization_name'] : null;
-        
-        $this->container['phone_number'] = isset($data['phone_number']) ? $data['phone_number'] : null;
+        $this->container['currency'] = isset($data['currency']) ? $data['currency'] : null;
         
     }
 
@@ -133,7 +125,7 @@ class PaymentTerminalContactAddress extends PaymentTerminalAddress
      */
     public function listInvalidProperties()
     {
-        $invalidProperties = parent::listInvalidProperties();
+        $invalidProperties = [];
 
         return $invalidProperties;
     }
@@ -145,7 +137,7 @@ class PaymentTerminalContactAddress extends PaymentTerminalAddress
      */
     public static function swaggerTypes()
     {
-        return self::$swaggerTypes + parent::swaggerTypes();
+        return self::$swaggerTypes;
     }
 
     /**
@@ -155,7 +147,7 @@ class PaymentTerminalContactAddress extends PaymentTerminalAddress
      */
     public static function swaggerFormats()
     {
-        return self::$swaggerFormats + parent::swaggerFormats();
+        return self::$swaggerFormats;
     }
 
 
@@ -167,7 +159,7 @@ class PaymentTerminalContactAddress extends PaymentTerminalAddress
      */
     public static function attributeMap()
     {
-        return parent::attributeMap() + self::$attributeMap;
+        return self::$attributeMap;
     }
 
     /**
@@ -177,7 +169,7 @@ class PaymentTerminalContactAddress extends PaymentTerminalAddress
      */
     public static function setters()
     {
-        return parent::setters() + self::$setters;
+        return self::$setters;
     }
 
     /**
@@ -187,7 +179,7 @@ class PaymentTerminalContactAddress extends PaymentTerminalAddress
      */
     public static function getters()
     {
-        return parent::getters() + self::$getters;
+        return self::$getters;
     }
 
     /**
@@ -216,100 +208,50 @@ class PaymentTerminalContactAddress extends PaymentTerminalAddress
     
 
     /**
-     * Gets family_name
+     * Gets amount
      *
-     * @return string
+     * @return float
      */
-    public function getFamilyName()
+    public function getAmount()
     {
-        return $this->container['family_name'];
+        return $this->container['amount'];
     }
 
     /**
-     * Sets family_name
+     * Sets amount
      *
-     * @param string $family_name 
+     * @param float $amount 
      *
      * @return $this
      */
-    public function setFamilyName($family_name)
+    public function setAmount($amount)
     {
-        $this->container['family_name'] = $family_name;
+        $this->container['amount'] = $amount;
 
         return $this;
     }
     
 
     /**
-     * Gets given_name
+     * Gets currency
      *
      * @return string
      */
-    public function getGivenName()
+    public function getCurrency()
     {
-        return $this->container['given_name'];
+        return $this->container['currency'];
     }
 
     /**
-     * Sets given_name
+     * Sets currency
      *
-     * @param string $given_name 
+     * @param string $currency 
      *
      * @return $this
      */
-    public function setGivenName($given_name)
+    public function setCurrency($currency)
     {
-        $this->container['given_name'] = $given_name;
-
-        return $this;
-    }
-    
-
-    /**
-     * Gets organization_name
-     *
-     * @return string
-     */
-    public function getOrganizationName()
-    {
-        return $this->container['organization_name'];
-    }
-
-    /**
-     * Sets organization_name
-     *
-     * @param string $organization_name 
-     *
-     * @return $this
-     */
-    public function setOrganizationName($organization_name)
-    {
-        $this->container['organization_name'] = $organization_name;
-
-        return $this;
-    }
-    
-
-    /**
-     * Gets phone_number
-     *
-     * @return string
-     */
-    public function getPhoneNumber()
-    {
-        return $this->container['phone_number'];
-    }
-
-    /**
-     * Sets phone_number
-     *
-     * @param string $phone_number 
-     *
-     * @return $this
-     */
-    public function setPhoneNumber($phone_number)
-    {
-        $this->container['phone_number'] = $phone_number;
+        $this->container['currency'] = $currency;
 
         return $this;
     }
@@ -321,6 +263,7 @@ class PaymentTerminalContactAddress extends PaymentTerminalAddress
      *
      * @return boolean
      */
+    #[\ReturnTypeWillChange]
     public function offsetExists($offset)
     {
         return isset($this->container[$offset]);
@@ -333,6 +276,7 @@ class PaymentTerminalContactAddress extends PaymentTerminalAddress
      *
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         return isset($this->container[$offset]) ? $this->container[$offset] : null;
@@ -346,6 +290,7 @@ class PaymentTerminalContactAddress extends PaymentTerminalAddress
      *
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetSet($offset, $value)
     {
         if (is_null($offset)) {
@@ -362,6 +307,7 @@ class PaymentTerminalContactAddress extends PaymentTerminalAddress
      *
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetUnset($offset)
     {
         unset($this->container[$offset]);

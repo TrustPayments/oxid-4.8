@@ -15,12 +15,13 @@ require_once(OX_BASE_PATH . 'modules/tru/TrustPayments/autoload.php');
 use Monolog\Logger;
 use TrustPayments\Sdk\Model\EntityQuery;
 use TrustPayments\Sdk\Model\TransactionCreate;
-use TrustPayments\Sdk\Model\TransactionLineItemUpdateRequest;
+use TrustPayments\Sdk\Model\TransactionLineItemVersionCreate;
 use TrustPayments\Sdk\Model\TransactionPending;
-use TrustPayments\Sdk\Service\TransactionInvoiceService;
 use Tru\TrustPayments\Core\TrustPaymentsModule;
 use \TrustPayments\Sdk\Service\TransactionService as SdkTransactionService;
 use \TrustPayments\Sdk\Service\TransactionIframeService;
+use TrustPayments\Sdk\Service\TransactionInvoiceService;
+use TrustPayments\Sdk\Service\TransactionLineItemVersionService;
 use \TrustPayments\Sdk\Service\TransactionPaymentPageService;
 
 /**
@@ -34,12 +35,20 @@ class TransactionService extends AbstractService {
 	private $invoiceService;
 	private $paymentPageService;
 	private $iframeService;
+	private $transactionLineItemVersionService;
 
 	protected function getService(){
 		if (!$this->service) {
 			$this->service = new SdkTransactionService(TrustPaymentsModule::instance()->getApiClient());
 		}
 		return $this->service;
+	}
+
+	protected function getTransactionLineItemVersionService(){
+	    if (!$this->transactionLineItemVersionService) {
+		$this->transactionLineItemVersionService = new TransactionLineItemVersionService(TrustPaymentsModule::instance()->getApiClient());
+	    }
+	    return $this->transactionLineItemVersionService;
 	}
 
 	/**
@@ -142,9 +151,18 @@ class TransactionService extends AbstractService {
 			return $this->getService()->update(TrustPaymentsModule::settings()->getSpaceId(), $transaction);
 		}
 	}
-
-	public function updateLineItems($spaceId, TransactionLineItemUpdateRequest $updateRequest){
-		return $this->getService()->updateTransactionLineItems($spaceId, $updateRequest);
+	/**
+	* Create a version of line items
+	*
+	* @param string $spaceId
+	* @param \TrustPayments\Sdk\Model\TransactionLineItemVersionCreate $lineItemVersion
+	* @return \TrustPayments\Sdk\Model\TransactionLineItemVersion
+	* @throws \TrustPayments\Sdk\ApiException
+	* @throws \TrustPayments\Sdk\Http\ConnectionException
+	* @throws \TrustPayments\Sdk\VersioningException 
+	*/
+	public function updateLineItems($spaceId, TransactionLineItemVersionCreate $lineItemVersion){
+		return $this->getTransactionLineItemVersionService()->create($spaceId, $lineItemVersion);
 	}
 
 	/**
