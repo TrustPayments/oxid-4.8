@@ -517,6 +517,7 @@ class_exists('oxorder');		$order = oxNew('oxorder');
 		$update = new TransactionLineItemVersionCreate();
 		$update->setLineItems($adapter->getLineItemData());
 		$update->setTransaction($this->getTransactionId());
+	    	$update->setExternalId(uniqid($this->getTransactionId()));
 		TransactionService::instance()->updateLineItems($this->getSpaceId(), $update);
 		$this->pull();
 		TrustPaymentsModule::log(Logger::DEBUG, "Complete update line items.");
